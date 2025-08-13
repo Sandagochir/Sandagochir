@@ -1,0 +1,176 @@
+int sensor=0;
+
+int mot2_pwm=13;
+int mot2_a=11;
+int mot2_b=12;
+int stby=10;
+int mot1_a=9;
+int mot1_b=8;
+int mot1_pwm=7;
+int mspeed=0;
+
+int a=0;
+int counter=45;
+
+int alham = 0;
+
+void setup() 
+{
+  Serial.begin(9600);
+  PORTA=B11110000;
+
+  pinMode(mot1_a, OUTPUT);
+  pinMode(mot1_b, OUTPUT);
+  pinMode(mot1_pwm, OUTPUT);
+
+  pinMode(mot2_a, OUTPUT);
+  pinMode(mot2_b, OUTPUT);
+  pinMode(mot2_pwm, OUTPUT);
+
+  pinMode(stby, OUTPUT);
+
+  digitalWrite(stby, HIGH);
+  analogWrite(mot1_pwm,0);
+  analogWrite(mot2_pwm,0);
+
+  digitalWrite(mot1_a, LOW);
+  digitalWrite(mot1_b, HIGH);
+  digitalWrite(mot2_a, LOW);
+  digitalWrite(mot2_b, HIGH);
+}
+void loop()
+{
+while( alham == 0)
+{
+  sensor=PINA;
+  if (sensor==255) 
+  { 
+      digitalWrite(mot1_a, HIGH);
+      digitalWrite(mot1_b, LOW);
+      digitalWrite(mot2_a, LOW);
+      digitalWrite(mot2_b, HIGH);
+      analogWrite(mot1_pwm,0);
+      analogWrite(mot2_pwm,0);
+      alham = 1;
+      break;
+  }
+  else 
+  {
+  white_line_follow();
+  }
+}
+while( alham == 1)
+{
+  sensor=PINA;
+  if (sensor==247  ) 
+  { 
+      digitalWrite(mot1_a, HIGH);
+      digitalWrite(mot1_b, LOW);
+      digitalWrite(mot2_a, LOW);
+      digitalWrite(mot2_b, HIGH);
+      analogWrite(mot1_pwm,0);
+      analogWrite(mot2_pwm,0);
+      alham = 2;
+      break;
+}
+else {
+    digitalWrite(mot1_a, HIGH);
+      digitalWrite(mot1_b, LOW);
+      digitalWrite(mot2_a, LOW);
+      digitalWrite(mot2_b, HIGH);
+      analogWrite(mot1_pwm,70);
+      analogWrite(mot2_pwm,70);
+}
+}
+while( alham == 2)
+{
+  sensor=PINA;
+  if (sensor==249) 
+    { 
+      analogWrite(mot1_pwm,0);
+      analogWrite(mot2_pwm,0);
+     
+      alham = 3;
+      break;
+    }
+     else 
+    {
+      white_line_follow();
+    }
+}
+    while( alham == 3)
+   {
+   
+      analogWrite(mot1_pwm,0);
+      analogWrite(mot2_pwm,0);
+      delay(1000);
+      alham = 4;
+      break;
+   }
+   
+}
+
+void white_line_follow() {
+PORTA=B11110000;
+sensor=PINA;
+Serial.println (sensor);
+    if (sensor==249)             //0110
+    { digitalWrite(mot1_a, LOW);
+      digitalWrite(mot1_b, HIGH);
+      digitalWrite(mot2_a, LOW);
+      digitalWrite(mot2_b, HIGH);
+      analogWrite(mot1_pwm,80);
+      analogWrite(mot2_pwm,80);
+    } 
+    else if (sensor==243)        //0011
+    { digitalWrite(mot1_a, LOW);
+      digitalWrite(mot1_b, HIGH);
+      digitalWrite(mot2_a, LOW);
+      digitalWrite(mot2_b, HIGH);
+      analogWrite(mot1_pwm,130);
+      analogWrite(mot2_pwm,50);
+    }
+    else if (sensor==247)        //
+    { digitalWrite(mot1_a, LOW);
+      digitalWrite(mot1_b, HIGH);
+      digitalWrite(mot2_a, LOW);
+      digitalWrite(mot2_b, HIGH);
+      analogWrite(mot1_pwm,150);
+      analogWrite(mot2_pwm,50);
+    } 
+    else if (sensor==252)        //1100
+    { digitalWrite(mot1_a, LOW);
+      digitalWrite(mot1_b, HIGH);
+      digitalWrite(mot2_a, LOW);
+      digitalWrite(mot2_b, HIGH);
+      analogWrite(mot1_pwm,50);
+      analogWrite(mot2_pwm,130);
+    }
+    else if (sensor==254)        //1000
+    { digitalWrite(mot1_a, LOW);
+      digitalWrite(mot1_b, HIGH);
+      digitalWrite(mot2_a, LOW);
+      digitalWrite(mot2_b, HIGH);
+      analogWrite(mot1_pwm,50);
+      analogWrite(mot2_pwm,150);
+    }  
+    else if (sensor==255)        //0000
+    {  
+      digitalWrite(mot1_a, HIGH);
+      digitalWrite(mot1_b, LOW);
+      digitalWrite(mot2_a, LOW);
+      digitalWrite(mot2_b, HIGH);
+      analogWrite(mot1_pwm,0);
+      analogWrite(mot2_pwm,0);
+    }
+    else if (sensor==253)        //0100
+    {  
+      digitalWrite(mot1_a, LOW);
+      digitalWrite(mot1_b, HIGH);
+      digitalWrite(mot2_a, LOW);
+      digitalWrite(mot2_b, HIGH);
+      analogWrite(mot1_pwm,100);
+      analogWrite(mot2_pwm,160);
+    }
+
+}
