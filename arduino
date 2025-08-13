@@ -1,0 +1,557 @@
+#include <Servo.h>
+Servo myservo1; //гарыг эргүүлэх серво
+Servo myservo2; //бөмбөг хамагч серво
+Servo myservo3; //амны доод серво
+Servo myservo4; //амны дээд серво
+Servo myservo5; 
+
+//// rotary encoder 
+
+const byte interruptPinz = 21;
+const byte interruptPinb = 20;
+volatile byte state = LOW;
+int z=0;
+int b=0;
+
+int sensor=0;
+
+int alham=15;
+
+const int trigPin = 5;
+const int echoPin = 6;
+
+long duration;
+int distance;
+int tsamhag;
+
+int mot2_pwm=13;
+int mot2_a=11;
+int mot2_b=12;
+int stby=10;
+int mot1_a=9;
+int mot1_b=8;
+int mot1_pwm=7;
+int mspeed=0;
+
+int cclock = 19;
+int CS = 17;
+int CMD = 15;
+int DAT = 14;
+
+// int sen1=22;
+// int sen2=23;
+// int sen3=24;
+// int sen4=25;
+
+unsigned char aa, bb;
+
+void setup()
+{
+  Serial.begin(9600);
+ 
+  pinMode(cclock, OUTPUT);
+  pinMode(CS, OUTPUT);
+  pinMode(CMD, OUTPUT);
+  pinMode(DAT, OUTPUT);
+
+  // pinMode (sen1, INPUT);
+  // pinMode (sen2, INPUT);
+  // pinMode (sen3, INPUT);
+  // pinMode (sen4, INPUT); 
+  
+  PORTA=B11110000;
+
+  pinMode(mot1_a, OUTPUT);
+  pinMode(mot1_b, OUTPUT);
+  pinMode(mot1_pwm, OUTPUT);
+
+  pinMode(mot2_a, OUTPUT);
+  pinMode(mot2_b, OUTPUT);
+  pinMode(mot2_pwm, OUTPUT);
+
+  pinMode(stby, OUTPUT);
+
+  digitalWrite(stby, HIGH);
+  analogWrite(mot1_pwm,0);
+  analogWrite(mot2_pwm,0);
+
+
+  digitalWrite(mot1_a, LOW);
+  digitalWrite(mot1_b, HIGH);
+  digitalWrite(mot2_a, LOW);
+  digitalWrite(mot2_b, HIGH);
+
+  myservo1.attach(4);
+  myservo1.write(90);
+  myservo2.attach(3);
+  myservo2.write(180);
+  myservo3.attach(2);
+  myservo3.write(90);
+  myservo4.attach(16);
+  myservo4.write(90);
+  myservo5.attach(18);
+  myservo5.write(0);
+
+
+  
+}
+void loop()
+{
+      
+          /*uragsh();
+          delay(1000);
+          uhrah();
+          delay(1000);
+          zuun();
+          delay(1000);
+          baruun();
+          delay(1000);
+          digitalWrite(mot4_a, LOW);
+          digitalWrite(mot4_b, HIGH);
+          analogWrite(mot4_pwm,100);
+          delay(1000);
+          digitalWrite(mot4_a, HIGH);
+          digitalWrite(mot4_b, LOW);
+          analogWrite(mot4_pwm,100);
+          delay(1000);
+          */
+          /*if(digitalRead(7)==HIGH)
+          {
+            Serial.println("ok");
+            }
+            else 
+            {
+            Serial.println("no");
+              }*/
+
+      while (alham==15)
+      {  
+unsigned char cc, dd;
+      digitalWrite(CS, LOW);
+      cc = 0xFF;
+      dd = 0x01; 
+      write_d(cc, dd);
+      cc = 0x41;
+      dd = 0x42;
+      write_d(cc, dd);
+      cc = 0x5a;
+      dd = 0x00;
+      write_d(cc, dd);
+      aa = read_d();
+      bb = read_d();
+
+      digitalWrite(CS, HIGH);
+      Serial.print("aa=");
+      Serial.print(aa);
+      Serial.print("bb=");
+      Serial.println(bb);        
+           
+          if (aa==255 && bb==255)
+            {
+              zogsoh();
+            }
+            else if (aa==239 && bb==255)
+            { 
+              uragsh();
+            }
+          else if (aa==247 && bb==255)
+            {
+              baruun();
+            }
+            else if (aa==253 && bb==255)
+            {
+              zuun();
+            }
+            else if (aa==251 && bb==255)
+            { 
+              uhrah();
+            } 
+            else if (aa==237&&bb==255)
+            {
+            }
+            else if (aa==231&&bb==255)
+            { 
+            }
+            else if (aa==255 && bb==253)
+            {
+              //myservo2.write(180);
+            }
+            else if (aa==255 && bb==247)
+            {
+              //myservo2.write(80);
+              //myservo1.write(90);
+            }
+            else if (aa==255 && bb==251)
+            {
+              myservo1.write(90);
+            }
+            else if (aa==255&& bb==239)
+            {
+              myservo1.write(0);
+            }
+            else if (aa==255 && bb==223)
+            {
+               
+            }
+            else if (aa==255&& bb==127)
+            {
+              
+            }
+            else if (aa==255&& bb==191)
+            { 
+                digitalWrite(mot1_b, HIGH);
+                digitalWrite(mot1_a, LOW);
+                analogWrite(mot1_pwm,50);
+                digitalWrite(mot2_a, LOW);
+                digitalWrite(mot2_b, HIGH);
+                analogWrite(mot2_pwm,50);
+                delay (500);
+              alham=0;
+              z=0; b=0;   
+              break;
+            }
+            else if (aa==223&& bb==255)
+            {
+            
+            }
+            else if (aa==127 && bb==255)
+            {
+            
+            }
+            else if (aa==191 && bb==255)
+            {
+            
+            }
+            else if (aa==237 && bb==255)
+            {
+
+            }
+            else if (aa==249 && bb==255)
+            {
+            
+            }
+            else if (aa==63 && bb==255)
+            {
+              
+            }
+
+
+       }
+
+           
+  while (alham==0)
+      {
+        //zai();
+          if (z>=183 && b>=183 || sensor==240)
+          {
+            analogWrite(mot1_pwm, 0);
+            analogWrite(mot2_pwm, 0);
+            delay (1000);
+            alham=1;
+            z=0; b=0;
+            break;
+          }
+          else
+          {
+            shugam();
+          }
+      }   
+    while (alham==1)
+      {
+        sensor=PINA;
+        if (z>=80 && (sensor==249 || sensor==243 || sensor==249) )
+          {
+            analogWrite(mot1_pwm, 0);
+            analogWrite(mot2_pwm, 0);
+            delay (1000);
+            alham=2;
+            z=0; b=0;
+            break;
+          }
+          else
+          {
+            analogWrite(mot1_pwm, 220);
+            analogWrite(mot2_pwm, 0);  
+
+          }
+      }    
+    while (alham==2)
+      {
+        if (z>=155 && b>=155 || sensor==255 )
+          {
+            analogWrite(mot1_pwm, 0);
+            analogWrite(mot2_pwm, 0);
+            delay (1000);
+            alham=3;
+            z=0; b=0;
+            break;
+          }
+          else
+          {
+            shugam();        
+          }
+      }  
+    while (alham==3)
+      { sensor=PINA;
+        if (z>=30 && b>=30 && sensor==255 )
+          {
+             
+            analogWrite(mot1_pwm,0);
+            analogWrite(mot2_pwm,0);
+            delay (1000);
+            myservo2.write(43);  // ergelet
+            delay (500);
+            myservo1.write(110);  // deesh doosh    
+            delay (500);
+            myservo4.write(0);
+            myservo3.write(0);
+            delay (200);
+            myservo4.write(100);
+            myservo3.write(100);
+            delay (100);
+
+            myservo1.write(100);  // deesh doosh    
+            delay (300);
+
+            myservo2.write(180);  // ergelet
+            delay (500);
+            alham=4;
+            z=0; b=0;
+            break;
+          }
+            else
+          {
+              analogWrite(mot1_pwm, 100);
+              analogWrite(mot2_pwm, 100);
+              //shugam ();
+          }
+        } 
+
+    while (alham==4)
+      {
+          if (z>=46 && b>=46 )
+        {
+            analogWrite(mot1_pwm, 0);
+            analogWrite(mot2_pwm, 0);
+            delay (1000);
+
+            myservo2.write(43);  // ergelet
+            delay (1000);
+            myservo1.write(100);  // deesh doosh    
+            delay (300);
+
+            myservo4.write(0);
+            myservo3.write(0);
+            delay (200);
+            myservo4.write(100);
+            myservo3.write(100);
+            alham=5;
+            z=0; b=0;
+            break;
+        }
+          else
+        {
+            digitalWrite(mot1_a, HIGH);
+            digitalWrite(mot1_b, LOW);
+            digitalWrite(mot2_a, HIGH);
+            digitalWrite(mot2_b, LOW);
+            analogWrite(mot1_pwm, 80);
+            analogWrite(mot2_pwm, 80);
+        }
+      }  
+      
+}
+
+void write_d(  unsigned char cc, unsigned char dd) /// write data
+{
+  int ee, ff;
+  for (ee = 0; ee < 8; ee++)
+  {
+    if (cc & 0x01)
+      digitalWrite(DAT, HIGH);
+    else
+      digitalWrite(DAT, LOW);
+    cc >>= 1;
+    if (dd & 0x01)
+      digitalWrite(CMD, HIGH);
+    else
+      digitalWrite(CMD, LOW);
+    dd >>= 1;
+    digitalWrite(cclock, LOW);
+    delayMicroseconds(10);
+    digitalWrite(cclock, HIGH);
+    delayMicroseconds(10);
+  }
+}
+unsigned char read_d()
+{
+  unsigned char bb, ee;
+  bb = 0;
+  pinMode(DAT, INPUT);
+  digitalWrite(CMD, LOW);
+  for (ee = 0; ee < 8; ee++)
+  { bb <<= 1;
+    digitalWrite(cclock, LOW);
+    delayMicroseconds(10);
+    digitalWrite(cclock, HIGH);
+    if (digitalRead(DAT) == HIGH)
+    {
+      bb |= 0x01;
+    }
+    else
+    {
+      bb |= 0x00;
+    }
+
+    delayMicroseconds(10);
+  }
+  pinMode(DAT, OUTPUT);
+  return (bb); // bb-iin utgiig butsaaj bn
+}
+void uhrah()
+{
+  digitalWrite(mot1_b, LOW);
+  digitalWrite(mot1_a, HIGH);
+  analogWrite(mot1_pwm,150);
+  digitalWrite(mot2_a, HIGH);
+  digitalWrite(mot2_b, LOW);
+  analogWrite(mot2_pwm,150);
+}
+void uragsh()
+{
+  digitalWrite(mot1_b, HIGH);
+  digitalWrite(mot1_a, LOW);
+  analogWrite(mot1_pwm,150);
+  digitalWrite(mot2_a, LOW);
+  digitalWrite(mot2_b, HIGH);
+  analogWrite(mot2_pwm,150);
+}
+void baruun()
+{
+  digitalWrite(mot1_b, HIGH);
+  digitalWrite(mot1_a, LOW);
+  analogWrite(mot1_pwm,150);
+  digitalWrite(mot2_a, HIGH);
+  digitalWrite(mot2_b, LOW);
+  analogWrite(mot2_pwm,150);
+
+}
+void zuun()
+{
+  digitalWrite(mot1_b, LOW);
+  digitalWrite(mot1_a, HIGH);
+  analogWrite(mot1_pwm,150);
+  digitalWrite(mot2_a, LOW);
+  digitalWrite(mot2_b, HIGH);
+  analogWrite(mot2_pwm,150);
+}
+
+void zuun_erge()
+{
+  
+  
+}
+void baruun_erge()
+{
+ 
+ 
+  }
+void zogsoh()
+{
+     analogWrite(mot1_pwm,0);
+     analogWrite(mot2_pwm,0);  
+}
+
+
+          // void zai()
+          // {
+          //   // Clears the trigPin
+          //   digitalWrite(trigPin, LOW);
+          //   delayMicroseconds(2);
+          //   // Sets the trigPin on HIGH state for 10 micro seconds
+          //   digitalWrite(trigPin, HIGH);
+          //   delayMicroseconds(10);
+          //   digitalWrite(trigPin, LOW);
+          //   // Reads the echoPin, returns the sound wave travel time in microseconds
+          //   duration = pulseIn(echoPin, HIGH);
+          //   // Calculating the distance
+          //   distance = duration * 0.034 / 2;
+          //   // Prints the distance on the Serial Monitor
+          //   Serial.print("Distance: ");
+          //   Serial.println(distance);
+          // }
+
+
+
+void encoderz ()
+  {
+   // delay(10);
+    z++;
+  }
+
+void encoderb ()
+  {
+    
+   // delay(10);
+    b++;
+  }
+  void shugam ()
+{
+  sensor=PINA;
+  mspeed=120;
+  switch (sensor)
+   { 
+    case 254: //1110
+    analogWrite(mot1_pwm, (mspeed-40));
+    analogWrite(mot2_pwm, (mspeed+40));
+    break; 
+    
+    case 252: //1100
+    analogWrite(mot1_pwm, (mspeed-30));
+    analogWrite(mot2_pwm, (mspeed+30));
+    break; 
+    
+    case 253: //0100
+    analogWrite(mot1_pwm, (mspeed-20));
+    analogWrite(mot2_pwm, (mspeed+20));
+    break; 
+    
+    case 248: //1000
+    analogWrite(mot1_pwm, (mspeed-10));
+    analogWrite(mot2_pwm, (mspeed+10));
+    break;
+    
+    case 249: // голын 2 мэдрэгч цагаан шугам дагах үед
+    analogWrite(mot1_pwm, mspeed);
+    analogWrite(mot2_pwm, mspeed);
+    break;
+
+    case 241:
+    analogWrite(mot1_pwm, (mspeed+10));
+    analogWrite(mot2_pwm, (mspeed-10));
+    break;
+
+    case 243:
+    analogWrite(mot1_pwm, (mspeed+20));
+    analogWrite(mot2_pwm, (mspeed-20));
+    break;
+    
+    case 247:
+    analogWrite(mot1_pwm, (mspeed+30));
+    analogWrite(mot2_pwm, (mspeed-30));
+    break;
+
+    case 255: // хар өнгө мэдрэх үед
+    mspeed=0;
+    analogWrite(mot1_pwm, 100);
+    analogWrite(mot2_pwm, mspeed);
+    break;
+    
+    case 240: // Цагаан өнгө мэдрэх үед
+    mspeed=0;
+    analogWrite(mot2_pwm, 100);
+    analogWrite(mot1_pwm, 100);
+    break;
+   }
+}
+
